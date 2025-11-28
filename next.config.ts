@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // turbopack configuration (no unsupported 'sourcemap' property)
+  turbopack: {},
 };
 
 export default nextConfig;
