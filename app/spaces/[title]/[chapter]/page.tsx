@@ -243,6 +243,7 @@ export default function ChapterPage() {
                 // Save regenerated version
                 try {
                   const stored = localStorage.getItem("generatedSpaces");
+                  if (!stored) return;
                   const arr = JSON.parse(stored);
 
                   const spaceIndex = arr.findIndex(
