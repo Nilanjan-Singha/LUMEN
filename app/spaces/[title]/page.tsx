@@ -34,7 +34,7 @@ export default function SpacePage() {
   }
 
   return (
-    <div className="flex gap-10 p-10">
+    <div className="flex w-full gap-10 p-10">
       {/* HEADER */}
       <div className="flex-1 space-y-10">
         <h1 className="text-4xl font-bold">{space.title}</h1>

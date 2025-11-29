@@ -6,6 +6,8 @@ import { Bookmark, Share2 } from "lucide-react";
 import mockCourse from "@/lib/mockCourse";
 import { generateChapterContent } from "./action";
 import MarkdownRenderer from "@/components/markdownrenderer/markdownrenderer";
+import Loading from "./loading";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function ChapterPage(props: {
   params: Promise<{ title: string; chapter: string }>;
@@ -16,9 +18,11 @@ export default function ChapterPage(props: {
   const [chapterData, setChapterData] = React.useState<any>(null);
   const [content, setContent] = React.useState<string>("");
   const [loading, setLoading] = React.useState(true);
-const [spacesArray, setSpacesArray] = React.useState<any[]>([]);
+  const [spacesArray, setSpacesArray] = React.useState<any[]>([]);
+  const [focusmode, setFocusmode] = React.useState(false);
 
-  // Resolve params promise ONCE
+
+      // Resolve params promise ONCE
   React.useEffect(() => {
     props.params.then((p) => setParams(p));
   }, [props.params]);
@@ -71,13 +75,15 @@ const [spacesArray, setSpacesArray] = React.useState<any[]>([]);
 
     setSpacesArray(updated);
     localStorage.setItem("generatedSpaces", JSON.stringify(updated));
-
-
       setLoading(false);
     }
 
     run();
   }, [space, chapterData, spacesArray, params]);
+
+  if (loading) {
+    return Loading();
+  }
 
   if (!space || !chapterData) {
     return <div className="p-10 text-red-500">Chapter not found.</div>;
@@ -97,11 +103,44 @@ const [spacesArray, setSpacesArray] = React.useState<any[]>([]);
       ? `/spaces/${encodeURIComponent(spaceName)}/chapter${chapterIndex + 2}`
       : null;
 
+      if (focusmode) {
+  return (
+    <div className="w-full p-10">
+      <div className="flex justify-between items-center mb-4 text-sm text-neutral-500">
+        <div>
+          <Link href="/spaces" className="hover:underline">Spaces</Link> /
+          <Link href={`/spaces/${encodeURIComponent(spaceName)}`} className="hover:underline">
+            {space.title}
+          </Link> /
+          <span>{chapterData.chapter}</span>
+        </div>
+
+        {/* Exit focus mode */}
+        <button
+          onClick={() => setFocusmode(false)}
+          className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800"
+        >
+          Exit Focus
+        </button>
+      </div>
+
+      <div className="max-w-max mx-auto">
+        <h1 className="text-3xl font-bold">{chapterData.chapter}</h1>
+        <p className="text-neutral-500 mt-1">{chapterData.topic}</p>
+
+        <div className="mt-6 border rounded-xl p-6 bg-white dark:bg-neutral-900">
+          <MarkdownRenderer content={content} />
+        </div>
+      </div>
+    </div>
+  );
+}    
   // RENDER
   return (
-    <div className="flex flex-col gap-10 p-10">
+    <div className="flex flex-col w-full gap-10 p-10">
       <div className="ch">
-        <div className="text-sm text-neutral-500 mb-4">
+        <div className="flex justify-between items-center text-sm text-neutral-500 mb-4">
+          <div>
           <Link href="/spaces" className="hover:underline">Spaces</Link> /
           <Link 
             href={`/spaces/${encodeURIComponent(spaceName)}`} 
@@ -110,6 +149,14 @@ const [spacesArray, setSpacesArray] = React.useState<any[]>([]);
             {space.title}
           </Link> /
           <span>{chapterData.chapter}</span>
+          </div>
+          {/* focus mode  icon */}
+          <div className="flex items-center gap-4">
+          <button onClick={() => {setFocusmode(true)} } className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800">
+            Focus
+          </button>
+          <ThemeToggle />
+          </div>
         </div>
 
         <h1 className="text-3xl font-bold mb-3">{space.title}</h1>

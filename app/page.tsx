@@ -10,13 +10,17 @@ import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex w-full min-h-screen ">
+    <div className="flex w-full min-h-screen min-w-0">
       
-      {/* Sidebar */}
-      <AppSidebar />
+    
+  <div className="w-max-content">
+  <AppSidebar />
+  </div>
+
+
 
       {/* Main Wrapper */}
-      <div className="flex flex-col flex-1 min-h-screen relative overflow-hidden">
+      <div className="flex flex-col flex-1 min-h-screen relative overflow-hidden ">
 
         {/* Theme Toggle */}
         <div className="flex w-full justify-end px-6 pt-6">
@@ -30,7 +34,7 @@ export default function Home() {
         </div>
 
         {/* HERO */}
-        <main className="flex flex-col  justify-center items-center text-center px-6 py-16 md:py-32">
+        <main className="flex flex-col justify-center items-center text-center px-6 py-16 md:py-32">
 
           <Badge
             variant="outline"

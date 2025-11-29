@@ -36,13 +36,13 @@ const Spaces = () => {
   });
 
   return (
-    <div className="flex w-full min-h-screen bg-zinc-50 dark:bg-black">
+    <div className="flex w-full min-h-screen bg-zinc-50 dark:bg-black min-w-0">
 
       {/* Sidebar */}
       <AppSidebar />
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col justify-start items-start p-12 bg-white dark:bg-black">
+      <main className="flex-1 w-full flex flex-col justify-start items-start p-12 bg-white dark:bg-black min-w-0">
         
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Spaces</h1>
         <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">

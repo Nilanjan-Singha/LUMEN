@@ -1,13 +1,19 @@
-import { 
-  Home, 
-  BookOpen, 
-  Library, 
-  BarChart3, 
-  Compass, 
-  Moon, 
-  Palette, 
-  Settings, 
-  User 
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import {
+  Home,
+  BookOpen,
+  Library,
+  BarChart3,
+  Compass,
+  Moon,
+  Palette,
+  Settings,
+  User,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react"
 
 import {
@@ -15,99 +21,81 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  // SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-// Main navigation items.
 const mainItems = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Spaces",
-    url: "/spaces",
-    icon: BookOpen,
-  },
-  {
-    title: "Library",
-    url: "/library",
-    icon: Library,
-  },
-  {
-    title: "Stats",
-    url: "/stats",
-    icon: BarChart3,
-  },
-  {
-    title: "Discover",
-    url: "/discover",
-    icon: Compass,
-  },
+  { title: "Home", url: "/", icon: Home },
+  { title: "Spaces", url: "/spaces", icon: BookOpen },
+  { title: "Library", url: "/library", icon: Library },
+  { title: "Stats", url: "/stats", icon: BarChart3 },
+  { title: "Discover", url: "/discover", icon: Compass },
 ]
 
-// User/settings items.
 const userItems = [
-  {
-    title: "Theme",
-    url: "/theme",
-    icon: Moon,
-  },
-  {
-    title: "Customise",
-    url: "/customise",
-    icon: Palette,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-  {
-    title: "Account",
-    url: "/account",
-    icon: User,
-  },
+  { title: "Theme", url: "/theme", icon: Moon },
+  { title: "Customise", url: "/customise", icon: Palette },
+  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Account", url: "/account", icon: User },
 ]
 
 export default function AppSidebar() {
+  const [collapsed, setCollapsed] = useState(false)
+
   return (
-    <Sidebar>
-      <SidebarHeader className="text-2xl font-bold p-8">LearnGraph</SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup className="px-8">
-          {/* <SidebarGroupLabel>Navigation</SidebarGroupLabel> */}
+    <Sidebar
+      style={{
+        // These ONLY control width.
+        "--sidebar-width": collapsed ? "5rem" : "16rem",
+        "--sidebar-width-icon": "5rem",
+      } as React.CSSProperties}
+      className={`
+        transition-all duration-300 border-r
+      `}
+      data-state={collapsed ? "collapsed" : "expanded"}
+    >
+      {/* Logo */}
+      <SidebarHeader
+        className={`
+          text-2xl font-bold p-6 transition-opacity duration-200
+          ${collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}
+        `}
+      >
+        LUMEN
+      </SidebarHeader>
+
+      {/* All links */}
+      <SidebarContent className={`transition-all ${collapsed ? "px-2" : "px-6"}`}>
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+                    <Link href={item.url} className="flex gap-4 items-center">
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup className="px-8">
-          {/* <SidebarGroupLabel>User</SidebarGroupLabel> */}
+
+        <SidebarGroup className="mt-4">
           <SidebarGroupContent>
             <SidebarMenu>
               {userItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+                    <Link href={item.url} className="flex gap-4 items-center">
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -115,6 +103,20 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Collapse Toggle */}
+      <div className="mt-auto p-4 flex justify-center">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-2 rounded-lg border hover:bg-accent transition-all"
+        >
+          {collapsed ? (
+            <ChevronsRight className="h-5 w-5" />
+          ) : (
+            <ChevronsLeft className="h-5 w-5" />
+          )}
+        </button>
+      </div>
     </Sidebar>
   )
 }
