@@ -18,6 +18,7 @@ const Spaces = () => {
   // Load dynamic spaces
   useEffect(() => {
     const stored = localStorage.getItem("generatedSpaces");
+    if (!stored) return;
     if (stored) {
       setGeneratedSpaces(JSON.parse(stored));
     }
