@@ -243,16 +243,13 @@ export default function ChapterPage() {
                 // Save regenerated version
                 try {
                   const stored = localStorage.getItem("generatedSpaces");
-                  if (!stored) return;
-                  const arr = JSON.parse(stored);
+if (!stored) return;
+const arr = JSON.parse(stored);
 
-                  const spaceIndex = arr.findIndex(
-                    (s: any) => s.title === space.title
-                  );
+const spaceIndex = arr.findIndex((s: any) => s.title === space.title);
+arr[spaceIndex].content[chapterIndex].generatedContent = txt;
 
-                  arr[spaceIndex].content[chapterIndex].generatedContent = txt;
-
-                  localStorage.setItem("generatedSpaces", JSON.stringify(arr));
+localStorage.setItem("generatedSpaces", JSON.stringify(arr));
                 } catch (e) {
                   console.error("Failed saving regenerated chapter:", e);
                 }
