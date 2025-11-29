@@ -2,37 +2,29 @@
 
 import React from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Bookmark, Share2 } from "lucide-react";
-import mockCourse from "@/lib/mockCourse";
 import { generateChapterContent } from "./action";
 import MarkdownRenderer from "@/components/markdownrenderer/markdownrenderer";
 import Loading from "./loading";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export default function ChapterPage(props: {
-  params: Promise<{ title: string; chapter: string }>;
-}) {
-  // HOOKS
-  const [params, setParams] = React.useState<{ title: string; chapter: string } | null>(null);
+export default function ChapterPage() {
+  const params = useParams() as { title: string; chapter: string };
+
   const [space, setSpace] = React.useState<any>(null);
   const [chapterData, setChapterData] = React.useState<any>(null);
   const [content, setContent] = React.useState<string>("");
-  const [loading, setLoading] = React.useState(true);
   const [spacesArray, setSpacesArray] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [focusmode, setFocusmode] = React.useState(false);
 
+  const chapterIndex =
+    Number(params.chapter.replace("chapter", "")) - 1;
+  const spaceName = decodeURIComponent(params.title);
 
-      // Resolve params promise ONCE
+  /** Load space + chapter */
   React.useEffect(() => {
-    props.params.then((p) => setParams(p));
-  }, [props.params]);
-
-  // Load space + chapter
-  React.useEffect(() => {
-    if (!params) return;
-
-    const spaceName = decodeURIComponent(params.title);
-
     const stored = localStorage.getItem("generatedSpaces");
     if (!stored) return;
 
@@ -42,57 +34,50 @@ export default function ChapterPage(props: {
     const found = arr.find((s: any) => s.title === spaceName);
     if (!found) return;
 
-    const chapterIndex = Number(params.chapter.replace("chapter", "")) - 1;
-
     setSpace(found);
     setChapterData(found.content?.[chapterIndex] ?? null);
-  }, [params]);
+  }, [params.title, params.chapter]);
 
-  // Generate chapter content from Gemini
+  /** Generate or load cached chapter content */
   React.useEffect(() => {
-  if (!space || !chapterData || !spacesArray || !params) return;
+    if (!space || !chapterData) return;
 
-      // If already cached, do NOT regenerate
- if (chapterData.generatedContent) {
-    setContent(chapterData.generatedContent);
-    setLoading(false);
-    return;
-  }
-      const chapterIndex = Number(params.chapter.replace("chapter", "")) - 1;
-
+    // Cached content?
+    if (chapterData.generatedContent) {
+      setContent(chapterData.generatedContent);
+      setLoading(false);
+      return;
+    }
 
     async function run() {
       setLoading(true);
       const res = await generateChapterContent({ space, chapterData });
-      const txt = String(res.content ?? "Failed to load content.");
+
+      const txt = String(res?.content || "Failed to load content.");
       setContent(txt);
-          // ---- SAVE to LOCALSTORAGE ----
 
-    const updated = [...spacesArray];
-    const sIndex = updated.findIndex((s: any) => s.title === space.title);
+      // Save new generated content
+      const updated = [...spacesArray];
+      const sIndex = updated.findIndex((s: any) => s.title === space.title);
 
-    updated[sIndex].content[chapterIndex].generatedContent = txt;
+      if (sIndex !== -1) {
+        updated[sIndex].content[chapterIndex].generatedContent = txt;
+        localStorage.setItem("generatedSpaces", JSON.stringify(updated));
+        setSpacesArray(updated);
+      }
 
-    setSpacesArray(updated);
-    localStorage.setItem("generatedSpaces", JSON.stringify(updated));
       setLoading(false);
     }
 
     run();
-  }, [space, chapterData, spacesArray, params]);
+  }, [space, chapterData]);
 
-  if (loading) {
-    return Loading();
-  }
+  if (loading) return <Loading />;
 
-  if (!space || !chapterData) {
+  if (!space || !chapterData)
     return <div className="p-10 text-red-500">Chapter not found.</div>;
-  }
 
-  // Prepare navigation safely
-  const spaceName = space.title;
-  const chapterIndex = Number(params!.chapter.replace("chapter", "")) - 1;
-
+  /** Navigation */
   const prevChapter =
     chapterIndex > 0
       ? `/spaces/${encodeURIComponent(spaceName)}/chapter${chapterIndex}`
@@ -103,59 +88,73 @@ export default function ChapterPage(props: {
       ? `/spaces/${encodeURIComponent(spaceName)}/chapter${chapterIndex + 2}`
       : null;
 
-      if (focusmode) {
-  return (
-    <div className="w-full p-10">
-      <div className="flex justify-between items-center mb-4 text-sm text-neutral-500">
-        <div>
-          <Link href="/spaces" className="hover:underline">Spaces</Link> /
-          <Link href={`/spaces/${encodeURIComponent(spaceName)}`} className="hover:underline">
-            {space.title}
-          </Link> /
-          <span>{chapterData.chapter}</span>
+  /** FOCUS MODE UI */
+  if (focusmode) {
+    return (
+      <div className="w-full p-10">
+        <div className="flex justify-between items-center mb-4 text-sm text-neutral-500">
+          <div>
+            <Link href="/spaces" className="hover:underline">
+              Spaces
+            </Link>{" "}
+            /
+            <Link
+              href={`/spaces/${encodeURIComponent(spaceName)}`}
+              className="hover:underline ml-1"
+            >
+              {space.title}
+            </Link>{" "}
+            / <span>{chapterData.chapter}</span>
+          </div>
+
+          <button
+            onClick={() => setFocusmode(false)}
+            className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800"
+          >
+            Exit Focus
+          </button>
         </div>
 
-        {/* Exit focus mode */}
-        <button
-          onClick={() => setFocusmode(false)}
-          className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800"
-        >
-          Exit Focus
-        </button>
-      </div>
+        <div className="max-w-max mx-auto">
+          <h1 className="text-3xl font-bold">{chapterData.chapter}</h1>
+          <p className="text-neutral-500 mt-1">{chapterData.topic}</p>
 
-      <div className="max-w-max mx-auto">
-        <h1 className="text-3xl font-bold">{chapterData.chapter}</h1>
-        <p className="text-neutral-500 mt-1">{chapterData.topic}</p>
-
-        <div className="mt-6 border rounded-xl p-6 bg-white dark:bg-neutral-900">
-          <MarkdownRenderer content={content} />
+          <div className="mt-6 border rounded-xl p-6 bg-white dark:bg-neutral-900">
+            <MarkdownRenderer content={content} />
+          </div>
         </div>
       </div>
-    </div>
-  );
-}    
-  // RENDER
+    );
+  }
+
+  /** NORMAL MODE */
   return (
     <div className="flex flex-col w-full gap-10 p-10">
+      {/* Top Metadata */}
       <div className="ch">
         <div className="flex justify-between items-center text-sm text-neutral-500 mb-4">
           <div>
-          <Link href="/spaces" className="hover:underline">Spaces</Link> /
-          <Link 
-            href={`/spaces/${encodeURIComponent(spaceName)}`} 
-            className="hover:underline"
-          >
-            {space.title}
-          </Link> /
-          <span>{chapterData.chapter}</span>
+            <Link href="/spaces" className="hover:underline">
+              Spaces
+            </Link>{" "}
+            /
+            <Link
+              href={`/spaces/${encodeURIComponent(spaceName)}`}
+              className="hover:underline ml-1"
+            >
+              {space.title}
+            </Link>{" "}
+            / <span>{chapterData.chapter}</span>
           </div>
-          {/* focus mode  icon */}
+
           <div className="flex items-center gap-4">
-          <button onClick={() => {setFocusmode(true)} } className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800">
-            Focus
-          </button>
-          <ThemeToggle />
+            <button
+              onClick={() => setFocusmode(true)}
+              className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800"
+            >
+              Focus
+            </button>
+            <ThemeToggle />
           </div>
         </div>
 
@@ -163,13 +162,21 @@ export default function ChapterPage(props: {
         <p className="text-neutral-500">{space.description}</p>
 
         <div className="flex gap-2 mt-3 flex-wrap text-sm">
-          <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">{space.level}</span>
-          <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">{space.time}</span>
-          <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">{space.chapters} chapters</span>
+          <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">
+            {space.level}
+          </span>
+          <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">
+            {space.time}
+          </span>
+          <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">
+            {space.chapters} chapters
+          </span>
         </div>
       </div>
 
+      {/* Main Layout */}
       <div className="chapter-content flex gap-10 w-full">
+        {/* Left Section */}
         <div className="border-r-2 space-y-6 w-2/3 pr-10">
           <h2 className="text-2xl font-semibold">{chapterData.chapter}</h2>
 
@@ -192,7 +199,10 @@ export default function ChapterPage(props: {
 
           <div className="flex justify-between mt-6">
             {prevChapter ? (
-              <Link href={prevChapter} className="px-4 py-2 border rounded hover:bg-gray-100">
+              <Link
+                href={prevChapter}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
                 ← Previous
               </Link>
             ) : (
@@ -200,60 +210,59 @@ export default function ChapterPage(props: {
             )}
 
             {nextChapter && (
-              <Link href={nextChapter} className="px-4 py-2 border rounded hover:bg-gray-100">
+              <Link
+                href={nextChapter}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
                 Next →
               </Link>
             )}
           </div>
         </div>
 
+        {/* Right Section */}
         <aside className="shrink-0 space-y-8 sticky top-10 h-fit w-2/3">
           <div className="p-5 border rounded-xl bg-white dark:bg-neutral-900">
-            <MarkdownRenderer
-              // content={Object.values(mockCourse.chapter1)
-              //   .map((lesson: any) => `# ${lesson.title}\n\n${lesson.content}`)
-              //   .join("\n\n---\n\n")}
-              content={content} 
-            />
+            <MarkdownRenderer content={content} />
           </div>
+
           <div className="pt-4">
-  <button
-    onClick={async () => {
-      setLoading(true);
-      setContent("");
+            <button
+              onClick={async () => {
+                setLoading(true);
+                setContent("");
 
-      const res = await generateChapterContent({ space, chapterData });
+                const res = await generateChapterContent({
+                  space,
+                  chapterData,
+                });
 
-      if (!res?.success) {
-        setContent("Error regenerating content.");
-        setLoading(false);
-        return;
-      }
+                const txt = String(res?.content || "");
+                setContent(txt);
 
-      const txt = String(res.content ?? "");
-      setContent(txt);
+                // Save regenerated version
+                try {
+                  const stored = localStorage.getItem("generatedSpaces");
+                  const arr = JSON.parse(stored);
 
-      // ---- SAVE NEW VERSION ----
-      try {
-        const stored = localStorage.getItem("generatedSpaces");
-        const arr = JSON.parse(stored);
+                  const spaceIndex = arr.findIndex(
+                    (s: any) => s.title === space.title
+                  );
 
-        const spaceIndex = arr.findIndex((s: any) => s.title === space.title);
+                  arr[spaceIndex].content[chapterIndex].generatedContent = txt;
 
-        arr[spaceIndex].content[chapterIndex].generatedContent = txt;
+                  localStorage.setItem("generatedSpaces", JSON.stringify(arr));
+                } catch (e) {
+                  console.error("Failed saving regenerated chapter:", e);
+                }
 
-        localStorage.setItem("generatedSpaces", JSON.stringify(arr));
-      } catch (e) {
-        console.error("Failed saving regenerated chapter:", e);
-      }
-
-      setLoading(false);
-    }}
-    className="flex items-center gap-2 px-3 py-2 mt-3 border rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-neutral-800"
-  >
-    ↻ Regenerate
-  </button>
-</div>
+                setLoading(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 mt-3 border rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-neutral-800"
+            >
+              ↻ Regenerate
+            </button>
+          </div>
         </aside>
       </div>
     </div>
