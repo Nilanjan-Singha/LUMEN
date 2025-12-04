@@ -54,6 +54,9 @@ export default function AppSidebar() {
       } as React.CSSProperties}
       className={`
         transition-all duration-300 border-r
+        data-[state=expanded]:w-[var(--sidebar-width)]
+        data-[state=collapsed]:w-[var(--sidebar-width-icon)]
+        m-4 rounded-lg overflow-hidden h-auto
       `}
       data-state={collapsed ? "collapsed" : "expanded"}
     >

@@ -18,13 +18,13 @@ export default function MarkdownRenderer({ content, className }: MarkdownRendere
         components={{
           // 1. Override Headers specifically to force styling
           h1: ({ node, ...props }) => (
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mt-8 mb-4 border-b pb-2" {...props} />
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-8 mb-4 border-b pb-2" {...props} />
           ),
           h2: ({ node, ...props }) => (
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-3" {...props} />
+            <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-3" {...props} />
           ),
           h3: ({ node, ...props }) => (
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-4 mb-2" {...props} />
+            <h3 className="text-md sm:text-xl font-medium text-gray-800 dark:text-gray-200 mt-4 mb-2" {...props} />
           ),
           
           // 2. Style Paragraphs and Lists

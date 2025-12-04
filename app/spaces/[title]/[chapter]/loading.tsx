@@ -22,7 +22,7 @@ export default function Loading() {
 
       <div className="chapter-content flex flex-1 gap-10 w-full">
         {/* LEFT SECTION */}
-        <div className="space-y-6 w-1/3 pr-10 border-r-2">
+        <div className="space-y-6 w-full sm:w-1/3 pr-10  border-r-0 sm:border-r-2">
           <div className="h-6  bg-neutral-300 dark:bg-neutral-800 rounded"></div>
 
           <div className="flex gap-2">
@@ -30,10 +30,10 @@ export default function Loading() {
             <div className="h-8 w-8 bg-neutral-300 dark:bg-neutral-800 rounded"></div>
           </div>
 
-          <div className="h-4 w-72 bg-neutral-300 dark:bg-neutral-800 rounded"></div>
+          <div className="h-4 w-72 bg-neutral-300 dark:bg-neutral-800 rounded "></div>
 
           {/* Subtopics list */}
-          <div className="space-y-2 mt-3">
+          <div className="space-y-2 mt-3 ">
             <div className="h-3 w-56 bg-neutral-300 dark:bg-neutral-800 rounded"></div>
             <div className="h-3 w-64 bg-neutral-300 dark:bg-neutral-800 rounded"></div>
             <div className="h-3 w-48 bg-neutral-300 dark:bg-neutral-800 rounded"></div>
@@ -47,7 +47,7 @@ export default function Loading() {
         </div>
 
         {/* RIGHT SIDEBAR */}
-        <aside className="shrink-0 w-2/3 space-y-8">
+        <aside className="shrink-0 w-2/3 space-y-8 hidden sm:block">
           <div className="p-5 border rounded-xl bg-white dark:bg-neutral-900 space-y-4">
             {/* Markdown Skeleton (multiple lines) */}
             <div className="space-y-3">

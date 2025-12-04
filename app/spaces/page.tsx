@@ -36,17 +36,32 @@ const Spaces = () => {
     );
   });
 
+const colors = [
+  "bg-red-200 text-red-600 border-red-300",
+  "bg-green-200 text-green-600 border-green-300",
+  "bg-blue-200 text-blue-600 border-blue-300",
+  "bg-yellow-100 text-yellow-700 border-yellow-300",
+  "bg-purple-200 text-purple-600 border-purple-300",
+  "bg-pink-200 text-pink-600 border-pink-300",
+  "bg-indigo-200 text-indigo-600 border-indigo-300",
+
+];
+
+const getRandomColor = () => {
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
   return (
-    <div className="flex w-full min-h-screen bg-zinc-50 dark:bg-black min-w-0">
+    <div className="flex w-full min-h-screen max-h-auto bg-zinc-50 dark:bg-black min-w-0">
 
       {/* Sidebar */}
       <AppSidebar />
 
       {/* Main content */}
-      <main className="flex-1 w-full flex flex-col justify-start items-start p-12 bg-white dark:bg-black min-w-0">
+      <main className="flex-1 w-full flex flex-col justify-start items-start p-6 sm:p-12 bg-white dark:bg-black min-w-0">
         
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Spaces</h1>
-        <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Spaces</h1>
+        <p className="mt-2 text-sm sm:text-lg text-gray-600 dark:text-gray-300">
           Explore your personalized learning spaces crafted by AI to map out chapters, sub-threads, and challenges in a living graph.
         </p>
 
@@ -57,18 +72,19 @@ const Spaces = () => {
             placeholder="Search your spaces..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="p-4 px-12 h-14 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+            className="p-4 px-12 text-sm sm:text-lg h-14 bg-gray-50 dark:bg-black/20 border-gray-200 dark:border-gray-700"
           />
         </div>
 
         {/* Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mt-12">
 
           {/* Add new space */}
           <Card
             className="
               flex items-center justify-center
               border-2 border-dashed
+              bg-transparent
               border-neutral-300 dark:border-neutral-700
               hover:border-neutral-400 dark:hover:border-neutral-600
               transition cursor-pointer rounded-xl
@@ -90,13 +106,14 @@ const Spaces = () => {
           </Card>
 
           {/* Existing spaces */}
-          {filteredSpaces.map((space) => (
-            <Card
-              key={space.title}
-              className="border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition"
-            >
+            {filteredSpaces.map((space, index) => (
+              <Card
+                key={space.title}
+                  className={`border shadow-sm hover:shadow-md transition rounded-xl cursor-pointer
+              border-neutral-200 dark:border-neutral-800 ${colors[index % colors.length]} hover:scale-105 transition-transform ease-in-out duration-200`}
+              >
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900 dark:text-white">
+                <CardTitle className="text-md sm:text-lg">
                   {space.title}
                 </CardTitle>
 
@@ -104,7 +121,7 @@ const Spaces = () => {
                   <Badge variant="secondary" className="text-xs">
                     {space.chapters} Chapters
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs text-black border-black ">
                     {space.level}
                   </Badge>
                   <Badge variant="default" className="text-xs">
@@ -113,7 +130,7 @@ const Spaces = () => {
                 </div>
               </CardHeader>
 
-              <CardContent className="text-sm text-neutral-600 dark:text-neutral-300">
+              <CardContent className="text-sm">
                 {space.description.slice(0, 90)}...
               </CardContent>
 

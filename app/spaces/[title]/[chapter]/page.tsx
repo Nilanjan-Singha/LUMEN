@@ -129,10 +129,10 @@ export default function ChapterPage() {
 
   /** NORMAL MODE */
   return (
-    <div className="flex flex-col w-full gap-10 p-10">
+    <div className="flex flex-col w-full gap-10 mt-4 sm:mt-0 px-0 sm:px-10 py-0 sm:py-10">
       {/* Top Metadata */}
       <div className="ch">
-        <div className="flex justify-between items-center text-sm text-neutral-500 mb-4">
+        <div className="hidden sm:flex justify-between items-center text-sm text-neutral-500 mb-4 ">
           <div>
             <Link href="/spaces" className="hover:underline">
               Spaces
@@ -147,7 +147,7 @@ export default function ChapterPage() {
             / <span>{chapterData.chapter}</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="items-center gap-4 hidden sm:flex">
             <button
               onClick={() => setFocusmode(true)}
               className="ml-4 p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800"
@@ -158,10 +158,10 @@ export default function ChapterPage() {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-3">{space.title}</h1>
-        <p className="text-neutral-500">{space.description}</p>
+        <h1 className="text-xl sm:text-3xl text-center font-bold mb-3">{space.title}</h1>
+        <p className="text-neutral-500 hidden sm:block">{space.description}</p>
 
-        <div className="flex gap-2 mt-3 flex-wrap text-sm">
+        <div className="flex justify-center gap-2 mt-3 flex-wrap text-sm">
           <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">
             {space.level}
           </span>
@@ -177,9 +177,8 @@ export default function ChapterPage() {
       {/* Main Layout */}
       <div className="chapter-content flex gap-10 w-full">
         {/* Left Section */}
-        <div className="border-r-2 space-y-6 w-2/3 pr-10">
+        <div className="border-r-2 space-y-6 w-2/3 pr-10 hidden sm:block">
           <h2 className="text-2xl font-semibold">{chapterData.chapter}</h2>
-
           <div className="flex gap-2">
             <button className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800">
               <Bookmark className="h-3 w-3" />
@@ -221,9 +220,9 @@ export default function ChapterPage() {
         </div>
 
         {/* Right Section */}
-        <aside className="shrink-0 space-y-8 sticky top-10 h-fit w-2/3">
-          <div className="p-5 border rounded-xl bg-white dark:bg-neutral-900">
-            <MarkdownRenderer content={content} />
+        <aside className="shrink-0 space-y-8 relative sm:sticky top-0 sm:top-10 h-fit w-full sm:w-2/3">
+          <div className="p-3 sm:p-5 border rounded-xl bg-white dark:bg-neutral-900">
+            <MarkdownRenderer content={content} className="text-sm sm:text-md" />
           </div>
 
           <div className="pt-4">
@@ -260,7 +259,28 @@ localStorage.setItem("generatedSpaces", JSON.stringify(arr));
             >
               ↻ Regenerate
             </button>
+                      <div className="flex justify-between mt-6 sm:hidden">
+            {prevChapter ? (
+              <Link
+                href={prevChapter}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                ← Previous
+              </Link>
+            ) : (
+              <div />
+            )}
+
+            {nextChapter && (
+              <Link
+                href={nextChapter}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Next →
+              </Link>
+            )}
           </div>
+        </div>
         </aside>
       </div>
     </div>

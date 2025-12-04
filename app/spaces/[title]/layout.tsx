@@ -9,7 +9,7 @@ export default function SpaceLayout({
   return (
     <div className="flex w-full min-h-screen min-w-0">
       <AppSidebar />
-      <main className="flex-1 p-10 overflow-y-auto min-w-0">{children}</main>
+      <main className="flex-1 p-4 sm:p-10 overflow-y-auto min-w-0">{children}</main>
     </div>
   );
 }
