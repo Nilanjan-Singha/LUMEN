@@ -116,8 +116,8 @@ export default function ChapterPage() {
         </div>
 
         <div className="max-w-max mx-auto">
-          <h1 className="text-3xl font-bold">{chapterData.chapter}</h1>
-          <p className="text-neutral-500 mt-1">{chapterData.topic}</p>
+          {/* <h1 className="text-3xl font-bold">{chapterData.chapter}</h1>
+          <p className="text-neutral-500 mt-1">{chapterData.topic}</p> */}
 
           <div className="mt-6 border rounded-xl p-6 bg-white dark:bg-neutral-900">
             <MarkdownRenderer content={content} />
@@ -158,10 +158,10 @@ export default function ChapterPage() {
           </div>
         </div>
 
-        <h1 className="text-xl sm:text-3xl text-center font-bold mb-3">{space.title}</h1>
+        <h1 className="text-xl sm:text-3xl text-justify sm:text-center font-bold mb-3">{space.title}</h1>
         <p className="text-neutral-500 hidden sm:block">{space.description}</p>
 
-        <div className="flex justify-center gap-2 mt-3 flex-wrap text-sm">
+        <div className="flex justify-start sm:justify-center gap-2 mt-3 flex-wrap text-sm">
           <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">
             {space.level}
           </span>
