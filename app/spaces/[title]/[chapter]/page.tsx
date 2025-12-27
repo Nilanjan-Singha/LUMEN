@@ -203,7 +203,6 @@ export default function ChapterPage() {
           <div className="flex gap-2">
             <button className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800 ">
               <Bookmark className="h-3 w-3" />
-              Bookmark
             </button>
 
             <button className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800">
