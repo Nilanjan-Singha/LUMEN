@@ -67,6 +67,7 @@ export default function CreateSpaceModal() {
   
   
     const result = await handleCreateSpace(fd);
+    // this result is from action.ts's handleCreateSpace
     setLoading(false);
 
     if (!result || !result.success) {

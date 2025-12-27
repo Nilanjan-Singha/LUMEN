@@ -37,7 +37,7 @@ export default function SpacePage() {
     <div className="flex w-full gap-0 sm:gap-10 p-2 sm:p-10">
       {/* HEADER */}
       <div className="flex-1 space-y-10">
-        <h1 className="text-2xl sm:text-4xl font-bold">{space.title}</h1>
+        <h1 className="p-2 sm:p-0 text-2xl sm:text-4xl font-bold">{space.title}</h1>
         <p className="text-sm sm:text-md text-neutral-500 -mt-5 sm:mt-2">{space.description}</p>
 
         <div className="flex gap-1 sm:gap-4 mt-4 text-sm">

@@ -47,7 +47,7 @@ export default function Loading() {
         </div>
 
         {/* RIGHT SIDEBAR */}
-        <aside className="shrink-0 w-2/3 space-y-8 hidden sm:block">
+        <aside className="shrink-0 w-1/3 space-y-8 hidden sm:block">
           <div className="p-5 border rounded-xl bg-white dark:bg-neutral-900 space-y-4">
             {/* Markdown Skeleton (multiple lines) */}
             <div className="space-y-3">

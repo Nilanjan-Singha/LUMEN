@@ -45,6 +45,7 @@ Generate ONLY valid JSON. Strict. No markdown.
       "chapter": "Chapter 1 • ...",
       "topic": "Short topic summary",
       "subtopics": ["...", "...", "..."]
+      // will need to make it an array of strings
     }
   ]
 }
@@ -104,6 +105,7 @@ Rules:
 // HANDLE FORM ACTION
 // ----------------------------------------
 export async function handleCreateSpace(formData: FormData) {
+  // i will get the form data entries here from the client modal
   const topic = formData.get("topic") as string;
   const level = formData.get("level") as string;
   const lens = formData.get("lens") as string;
@@ -128,3 +130,5 @@ export async function handleCreateSpace(formData: FormData) {
 
   return result;
 }
+
+// after result is returned to the client, the client will handle updating database

@@ -8,12 +8,12 @@ import ThemeToggle from "@/components/ThemeToggle";
 export default function Home() {
   return (
     <div className="flex w-full min-h-screen min-w-0">
-      <div className="w-max-content">
+      <div className="shrink-0">
         <AppSidebar />
       </div>
 
       {/* Main Wrapper */}
-      <div className="flex flex-col flex-1 min-h-screen relative overflow-hidden ">
+      <div className="flex flex-col flex-1 min-h-screen relative overflow-hidden min-w-0">
         {/* Theme Toggle */}
         <div className="flex w-full justify-end px-6 pt-6">
           <ThemeToggle />

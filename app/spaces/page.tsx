@@ -3,12 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import AppSidebar from "@/components/sidebar/sidebar";
 import { Input } from '@/components/ui/input';
-import { Search, ArrowRight, Plus } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
+import { handleCreateSpace } from './action';
 
 const Spaces = () => {
   const router = useRouter();
@@ -18,10 +19,7 @@ const Spaces = () => {
   // Load dynamic spaces
   useEffect(() => {
     const stored = localStorage.getItem("generatedSpaces");
-    if (!stored) return;
-    if (stored) {
-      setGeneratedSpaces(JSON.parse(stored));
-    }
+    if (stored) setGeneratedSpaces(JSON.parse(stored));
   }, []);
 
   // NEWEST FIRST
@@ -36,33 +34,20 @@ const Spaces = () => {
     );
   });
 
-const colors = [
-  "bg-red-200 text-red-600 border-red-300",
-  "bg-green-200 text-green-600 border-green-300",
-  "bg-blue-200 text-blue-600 border-blue-300",
-  "bg-yellow-100 text-yellow-700 border-yellow-300",
-  "bg-purple-200 text-purple-600 border-purple-300",
-  "bg-pink-200 text-pink-600 border-pink-300",
-  "bg-indigo-200 text-indigo-600 border-indigo-300",
-
-];
-
-const getRandomColor = () => {
-  return colors[Math.floor(Math.random() * colors.length)];
-};
-
   return (
-    <div className="flex w-full min-h-screen max-h-auto bg-zinc-50 dark:bg-black min-w-0">
+    <div className="flex w-full min-h-screen bg-zinc-50 dark:bg-black min-w-0">
 
       {/* Sidebar */}
-      <AppSidebar />
+      <div className="shrink-0">
+        <AppSidebar />
+      </div>
 
       {/* Main content */}
-      <main className="flex-1 w-full flex flex-col justify-start items-start p-6 sm:p-12 bg-white dark:bg-black min-w-0">
-        
+      <main className="flex-1 w-full flex flex-col justify-start items-start p-12 bg-white dark:bg-black min-w-0">
+
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Spaces</h1>
         <p className="mt-2 text-sm sm:text-lg text-gray-600 dark:text-gray-300">
-          Explore your personalized learning spaces crafted by AI to map out chapters, sub-threads, and challenges in a living graph.
+          Explore personalized learning spaces crafted by AI.
         </p>
 
         {/* Search */}
@@ -76,80 +61,86 @@ const getRandomColor = () => {
           />
         </div>
 
-        {/* Grid */}
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mt-12">
+{/* When there are NO results (not inside grid) */}
+{filteredSpaces.length === 0 ? (
+  <div className="w-full flex flex-col items-center justify-center gap-4 py-20">
+    <p className="text-md text-gray-500 dark:text-gray-400 text-center">
+      No spaces found. Try adjusting your search or create a new space.
+    </p>
+    <button onClick={() => router.push("/spaces/new")}>
+      Create Space
+    </button>
+  </div>
+) : (
+  <>
+    {/* Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-12">
 
-          {/* Add new space */}
-          <Card
-            className="
-              flex items-center justify-center
-              border-2 border-dashed
-              bg-transparent
-              border-neutral-300 dark:border-neutral-700
-              hover:border-neutral-400 dark:hover:border-neutral-600
-              transition cursor-pointer rounded-xl
-            "
-            role="button"
-            tabIndex={0}
-            onClick={() => router.push("/spaces/new")}
-            onKeyDown={(e) => e.key === "Enter" && router.push("/spaces/new")}
-          >
-            <CardContent className="flex flex-col items-center justify-center gap-2 text-center py-8">
-              <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
-                <Plus className="h-6 w-6 text-neutral-600 dark:text-neutral-300" />
-              </div>
+      {/* Add New Space Card */}
+      <Card
+        className="flex items-center justify-center border-2 border-dashed 
+                   bg-transparent border-neutral-300 dark:border-neutral-700
+                   hover:border-neutral-400 dark:hover:border-neutral-600
+                   transition cursor-pointer rounded-xl"
+        role="button"
+        tabIndex={0}
+        onClick={() => router.push("/spaces/new")}
+        onKeyDown={(e) => e.key === "Enter" && router.push("/spaces/new")}
+      >
+        <CardContent className="flex flex-col items-center justify-center gap-2 text-center py-8">
+          <div className="h-12 w-12 rounded-full flex items-center justify-center 
+                          bg-neutral-100 dark:bg-neutral-800">
+            <Plus className="h-6 w-6 text-neutral-600 dark:text-neutral-300" />
+          </div>
 
-              <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                New Space
-              </p>
-            </CardContent>
-          </Card>
+          <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            New Space
+          </p>
+        </CardContent>
+      </Card>
 
-          {/* Existing spaces */}
-            {filteredSpaces.map((space, index) => (
-              <Card
-                key={space.title}
-                  className={`border shadow-sm hover:shadow-md transition rounded-xl cursor-pointer
-              border-neutral-200 dark:border-neutral-800 ${colors[index % colors.length]} hover:scale-105 transition-transform ease-in-out duration-200`}
-              >
-              <CardHeader>
-                <CardTitle className="text-md sm:text-lg">
-                  {space.title}
-                </CardTitle>
+      {/* Existing Spaces */}
+      {filteredSpaces.map((space) => (
+        <Card
+          key={space.title}
+          className="border shadow-sm hover:shadow-md rounded-xl cursor-pointer
+                     border-neutral-200 dark:border-neutral-800 
+                     hover:scale-105 transition-transform duration-200"
+        >
+          <CardHeader>
+            <CardTitle className="text-md sm:text-lg">
+              {space.title}
+            </CardTitle>
 
-                <div className="flex gap-2 mt-2 flex-wrap">
-                  <Badge variant="secondary" className="text-xs">
-                    {space.chapters} Chapters
-                  </Badge>
-                  <Badge variant="outline" className="text-xs text-black border-black ">
-                    {space.level}
-                  </Badge>
-                  <Badge variant="default" className="text-xs">
-                    ⏱ {space.time}
-                  </Badge>
-                </div>
-              </CardHeader>
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <Badge variant="secondary" className="text-xs">
+                {space.chapters} Chapters
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {space.level}
+              </Badge>
+              <Badge variant="default" className="text-xs">
+                ⏱ {space.time}
+              </Badge>
+            </div>
+          </CardHeader>
 
-              <CardContent className="text-sm">
-                {space.description.slice(0, 90)}...
-              </CardContent>
+          <CardContent className="text-sm">
+            {space.description.slice(0, 90)}...
+          </CardContent>
 
-              <CardFooter className="flex justify-between items-center">
-                <Link href={`/spaces/${space.title}`}>
-                  <Button variant="outline" size="sm">
-                    View Details
-                  </Button>
-                </Link>
-
-                <Link href={`/spaces/${space.title}`}>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                    Start <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+          <CardFooter className="flex justify-between items-center">
+            <Link href={`/spaces/${space.title}`}>
+              <Button variant="outline" size="sm">
+                View Details
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  </>
+)}
       </main>
     </div>
   );

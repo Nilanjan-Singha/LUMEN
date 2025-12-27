@@ -16,17 +16,6 @@ import {
   ChevronsRight
 } from "lucide-react"
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-
 const mainItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Spaces", url: "/spaces", icon: BookOpen },
@@ -46,72 +35,62 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <Sidebar
+    <div
       style={{
-        // These ONLY control width.
         "--sidebar-width": collapsed ? "5rem" : "16rem",
-        "--sidebar-width-icon": "5rem",
       } as React.CSSProperties}
       className={`
+        w-(--sidebar-width)
         transition-all duration-300 border-r
-        data-[state=expanded]:w-[var(--sidebar-width)]
-        data-[state=collapsed]:w-[var(--sidebar-width-icon)]
-        m-4 rounded-lg overflow-hidden h-auto
+        flex flex-col h-screen bg-sidebar text-sidebar-foreground
+        overflow-hidden
+        sticky top-0 left-0
       `}
-      data-state={collapsed ? "collapsed" : "expanded"}
     >
       {/* Logo */}
-      <SidebarHeader
+      <div
         className={`
           text-2xl font-bold p-6 transition-opacity duration-200
           ${collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}
         `}
       >
         LUMEN
-      </SidebarHeader>
+      </div>
 
       {/* All links */}
-      <SidebarContent className={`transition-all ${collapsed ? "px-2" : "px-6"}`}>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex gap-4 items-center">
-                      <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <div className={`flex-1 overflow-y-auto transition-all ${collapsed ? "px-4" : "px-6"}`}>
+        <div className="space-y-2">
+          {mainItems.map((item) => (
+            <Link
+              key={item.title}
+              href={item.url}
+              className="flex gap-4 items-center p-2 rounded-lg hover:bg-sidebar-accent transition-colors"
+            >
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span className="text-sm">{item.title}</span>}
+            </Link>
+          ))}
+        </div>
 
-        <SidebarGroup className="mt-4">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {userItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex gap-4 items-center">
-                      <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+        <div className="mt-4 space-y-2">
+          {userItems.map((item) => (
+            <Link
+              key={item.title}
+              href={item.url}
+              className="flex gap-4 items-center p-2 rounded-lg hover:bg-sidebar-accent transition-colors"
+            >
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span className="text-sm">{item.title}</span>}
+            </Link>
+          ))}
+        </div>
+      </div>
 
       {/* Collapse Toggle */}
-      <div className="mt-auto p-4 flex justify-center">
+      <div className="p-4 flex justify-end border-t">
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-lg border hover:bg-accent transition-all"
+          className="p-2 rounded-lg border hover:bg-sidebar-accent transition-all"
         >
           {collapsed ? (
             <ChevronsRight className="h-5 w-5" />
@@ -120,6 +99,6 @@ export default function AppSidebar() {
           )}
         </button>
       </div>
-    </Sidebar>
+    </div>
   )
 }

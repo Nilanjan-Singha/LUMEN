@@ -8,6 +8,12 @@ import { generateChapterContent } from "./action";
 import MarkdownRenderer from "@/components/markdownrenderer/markdownrenderer";
 import Loading from "./loading";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Download } from "lucide-react";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import { ChapterPDF } from "@/components/chapterPDF";
+
+
 
 export default function ChapterPage() {
   const params = useParams() as { title: string; chapter: string };
@@ -19,8 +25,7 @@ export default function ChapterPage() {
   const [loading, setLoading] = React.useState(true);
   const [focusmode, setFocusmode] = React.useState(false);
 
-  const chapterIndex =
-    Number(params.chapter.replace("chapter", "")) - 1;
+  const chapterIndex = Number(params.chapter.replace("chapter", "")) - 1;
   const spaceName = decodeURIComponent(params.title);
 
   /** Load space + chapter */
@@ -88,6 +93,20 @@ export default function ChapterPage() {
       ? `/spaces/${encodeURIComponent(spaceName)}/chapter${chapterIndex + 2}`
       : null;
 
+  // PDF Export
+  const exportToPDF = async () => {
+  const blob = await pdf(
+    <ChapterPDF
+      space={space}
+      chapter={chapterData}
+      content={content}
+    />
+  ).toBlob();
+
+  saveAs(blob, `${space.title}-${chapterData.chapter}.pdf`);
+};
+
+
   /** FOCUS MODE UI */
   if (focusmode) {
     return (
@@ -129,7 +148,7 @@ export default function ChapterPage() {
 
   /** NORMAL MODE */
   return (
-    <div className="flex flex-col w-full gap-10 mt-4 sm:mt-0 px-0 sm:px-10 py-0 sm:py-10">
+    <div className="flex flex-col w-full gap-10 mt-4 sm:mt-0 px-0 sm:px-10 py-0 sm:py-10 min-w-0">
       {/* Top Metadata */}
       <div className="ch">
         <div className="hidden sm:flex justify-between items-center text-sm text-neutral-500 mb-4 ">
@@ -158,10 +177,12 @@ export default function ChapterPage() {
           </div>
         </div>
 
-        <h1 className="text-xl sm:text-3xl text-justify sm:text-center font-bold mb-3">{space.title}</h1>
+        <h1 className="text-xl sm:text-3xl text-justify sm:text-left font-bold mb-3">
+          {space.title}
+        </h1>
         <p className="text-neutral-500 hidden sm:block">{space.description}</p>
 
-        <div className="flex justify-start sm:justify-center gap-2 mt-3 flex-wrap text-sm">
+        <div className="flex justify-start sm:justify-left gap-2 mt-3 flex-wrap text-sm">
           <span className="px-3 py-1 bg-neutral-200 dark:bg-neutral-800 rounded-full">
             {space.level}
           </span>
@@ -175,16 +196,25 @@ export default function ChapterPage() {
       </div>
 
       {/* Main Layout */}
-      <div className="chapter-content flex gap-10 w-full">
+      <div className="chapter-content flex gap-10 w-full min-w-0">
         {/* Left Section */}
-        <div className="border-r-2 space-y-6 w-2/3 pr-10 hidden sm:block">
+        <div className="border-r-2 space-y-6 flex-1 pr-10 hidden sm:block min-w-0">
           <h2 className="text-2xl font-semibold">{chapterData.chapter}</h2>
           <div className="flex gap-2">
-            <button className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800">
+            <button className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800 ">
               <Bookmark className="h-3 w-3" />
+              Bookmark
             </button>
+
             <button className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800">
               <Share2 className="h-3 w-3" />
+            </button>
+
+            <button
+              onClick={exportToPDF}
+              className="p-2 border rounded hover:bg-gray-100 dark:hover:bg-neutral-800"
+            >
+              <Download className="h-3 w-3" />
             </button>
           </div>
 
@@ -221,8 +251,14 @@ export default function ChapterPage() {
 
         {/* Right Section */}
         <aside className="shrink-0 space-y-8 relative sm:sticky top-0 sm:top-10 h-fit w-full sm:w-2/3">
-          <div className="p-3 sm:p-5 border rounded-xl bg-white dark:bg-neutral-900">
-            <MarkdownRenderer content={content} className="text-sm sm:text-md" />
+            <div
+              id="chapter-pdf-content"
+              className="p-3 sm:p-5 border rounded-xl bg-white dark:bg-neutral-900"
+            >
+              <MarkdownRenderer
+                content={content}
+                className="text-sm sm:text-md"
+              />
           </div>
 
           <div className="pt-4">
@@ -242,13 +278,15 @@ export default function ChapterPage() {
                 // Save regenerated version
                 try {
                   const stored = localStorage.getItem("generatedSpaces");
-if (!stored) return;
-const arr = JSON.parse(stored);
+                  if (!stored) return;
+                  const arr = JSON.parse(stored);
 
-const spaceIndex = arr.findIndex((s: any) => s.title === space.title);
-arr[spaceIndex].content[chapterIndex].generatedContent = txt;
+                  const spaceIndex = arr.findIndex(
+                    (s: any) => s.title === space.title
+                  );
+                  arr[spaceIndex].content[chapterIndex].generatedContent = txt;
 
-localStorage.setItem("generatedSpaces", JSON.stringify(arr));
+                  localStorage.setItem("generatedSpaces", JSON.stringify(arr));
                 } catch (e) {
                   console.error("Failed saving regenerated chapter:", e);
                 }
@@ -259,28 +297,28 @@ localStorage.setItem("generatedSpaces", JSON.stringify(arr));
             >
               ↻ Regenerate
             </button>
-                      <div className="flex justify-between mt-6 sm:hidden">
-            {prevChapter ? (
-              <Link
-                href={prevChapter}
-                className="px-4 py-2 border rounded hover:bg-gray-100"
-              >
-                ← Previous
-              </Link>
-            ) : (
-              <div />
-            )}
+            <div className="flex justify-between mt-6 sm:hidden">
+              {prevChapter ? (
+                <Link
+                  href={prevChapter}
+                  className="px-4 py-2 border rounded hover:bg-gray-100"
+                >
+                  ← Previous
+                </Link>
+              ) : (
+                <div />
+              )}
 
-            {nextChapter && (
-              <Link
-                href={nextChapter}
-                className="px-4 py-2 border rounded hover:bg-gray-100"
-              >
-                Next →
-              </Link>
-            )}
+              {nextChapter && (
+                <Link
+                  href={nextChapter}
+                  className="px-4 py-2 border rounded hover:bg-gray-100"
+                >
+                  Next →
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
         </aside>
       </div>
     </div>
