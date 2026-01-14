@@ -1,15 +1,13 @@
-// components/ChapterPDF.tsx
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, StyleSheet } from "@react-pdf/renderer";
+import { MarkdownToPDF } from "./MarkdownToPDF";
 
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    fontSize: 11,
-    lineHeight: 1.6,
   },
   title: {
     fontSize: 18,
-    marginBottom: 10,
+    marginBottom: 8,
     fontWeight: "bold",
   },
   subtitle: {
@@ -17,10 +15,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#555",
   },
-  paragraph: {
-    marginBottom: 10,
-  },
 });
+
+function removeFirstHeading(markdown: string) {
+  return markdown.replace(/^#{1,2}\s.+\n+/, "");
+}
 
 export function ChapterPDF({
   space,
@@ -31,17 +30,19 @@ export function ChapterPDF({
   chapter: any;
   content: string;
 }) {
+  const cleanedContent = removeFirstHeading(content);
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        {/* Main Title */}
         <Text style={styles.title}>{chapter.chapter}</Text>
+
+        {/* Subtitle */}
         <Text style={styles.subtitle}>{chapter.topic}</Text>
 
-        {content.split("\n\n").map((p, i) => (
-          <Text key={i} style={styles.paragraph}>
-            {p}
-          </Text>
-        ))}
+        {/* Markdown body (without duplicated heading) */}
+        <MarkdownToPDF markdown={cleanedContent} />
       </Page>
     </Document>
   );
