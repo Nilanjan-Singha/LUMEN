@@ -1,3 +1,4 @@
+import React from "react";
 import { Text, View, StyleSheet } from "@react-pdf/renderer";
 import { remark } from "remark";
 import remarkParse from "remark-parse";
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
 export function MarkdownToPDF({ markdown }: { markdown: string }) {
   const tree = remark().use(remarkParse).parse(markdown);
 
-  const elements: JSX.Element[] = [];
+const elements: React.ReactElement[] = [];
 
   visit(tree, (node: any) => {
     switch (node.type) {
